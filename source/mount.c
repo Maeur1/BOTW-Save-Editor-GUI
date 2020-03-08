@@ -17,11 +17,11 @@ int mountSaveData()
     Result rc = 0;
 
     FsFileSystem tmpfs;
-    u128 userID=0;
+    AccountUid userID={0};
     bool account_selected=0;
     u64 titleID=0x01007ef00011e000;
 
-    rc = accountInitialize();
+    rc = accountInitialize(AccountServiceType_Application);
     
     if (R_FAILED(rc)) {
         printf("accountInitialize() failed: 0x%x\n", rc);
@@ -29,11 +29,11 @@ int mountSaveData()
     }
 
     if (R_SUCCEEDED(rc)) {
-        rc = accountGetActiveUser(&userID, &account_selected);
+	rc = accountGetPreselectedUser(&userID);
         accountExit();
 
      if (R_FAILED(rc)) {
-            printf("accountGetActiveUser() failed: 0x%x\n", rc);
+            printf("(accountGetPreselectedUser) failed: 0x%x\n", rc);
             return 0;
         }
      else if(!account_selected) {
@@ -44,13 +44,13 @@ int mountSaveData()
     }
 
     if (R_SUCCEEDED(rc)) {
-        printf("Using titleID=0x%016lx userID: 0x%lx 0x%lx\n", titleID, (u64)(userID>>64), (u64)userID);
+	printf("Using titleID=0x%016lx userID: 0x%lx 0x%lx\n", titleID, userID.uid[1], userID.uid[0]);
     }
 
     if (R_SUCCEEDED(rc)) {
-        rc = fsMount_SaveData(&tmpfs, titleID, userID);
+	rc = fsdevMountSaveData("save", titleID, userID);
         if (R_FAILED(rc)) {
-            printf("fsMount_SaveData() failed: 0x%x\n", rc);
+            printf("fsdevMountSaveData() failed: 0x%x\n", rc);
             return 0;
         }
 
