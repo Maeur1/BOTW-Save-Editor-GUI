@@ -48,7 +48,7 @@ int mountSaveData()
     }
 
     if (R_SUCCEEDED(rc)) {
-	rc = fsdevMountSaveData("save", titleID, userID);
+	rc = fsOpen_SaveData(&tmpfs, titleID, userID);
         if (R_FAILED(rc)) {
             printf("fsdevMountSaveData() failed: 0x%x\n", rc);
             return 0;
