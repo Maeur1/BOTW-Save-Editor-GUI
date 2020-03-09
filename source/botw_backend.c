@@ -171,12 +171,8 @@ int setFile(int intSlot){
 	rupeeValue = 0;
 	rupees = 0;
     
-    char file_name[75];
-    char header[] = "save:/";
-    char footer[] = "/game_data.sav";
-
-    snprintf(file_name, sizeof file_name, "%s%d%s", header, intSlot, footer);
-    
+    char file_name[] = "save:/0/game_data.sav";
+    file_name[6] = (char)(intSlot + 65);
     fp = fopen(file_name,"r+b");
     
     if( fp == NULL )
