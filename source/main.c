@@ -1,7 +1,7 @@
 #include "main.h"
 
 void startSDLServices(){
-    
+
     SDL_Init(SDL_INIT_VIDEO);
     TTF_Init();
     
@@ -489,7 +489,9 @@ void MenuButtons(int x){
 
 int main(int argc, char **argv){
 
-    appletSetScreenShotPermission(1);
+    appletSetScreenShotPermission(AppletScreenShotPermission_Enable);
+    socketInitializeDefault();
+    nxlinkStdio();
     initServices();
 
     while(appletMainLoop())
@@ -558,5 +560,5 @@ void closeServices(){
     TTF_Quit();
     romfsExit();
     SDL_Quit();
-
+    socketExit();
 }
