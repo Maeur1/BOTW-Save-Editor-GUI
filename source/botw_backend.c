@@ -172,7 +172,7 @@ int setFile(int intSlot){
 	rupees = 0;
     
     char file_name[] = "save:/0/game_data.sav";
-    file_name[6] = (char)(intSlot + 65);
+    file_name[6] = (char)(intSlot + 48);
     fp = fopen(file_name,"r+b");
     
     if( fp == NULL )
