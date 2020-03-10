@@ -1,9 +1,8 @@
 #include "botw_backend.h"
 
-int rupID[7]      = {0x00e0a0, 0x00e110, 0x00e110, 0x00e678, 0x00e730, 0x00eaf8, 0x00eaf8};
 int itemsID[7]    = {0x052828, 0x0528d8, 0x0528c0, 0x053890, 0x05fa48, 0x060408, 0x060408};
 int itemsQuant[7] = {0x063340, 0x0633f0, 0x0633d8, 0x064550, 0x070730, 0x0711c8, 0x0711c8};
-int header[7]     = {0x24e2,   0x24ee,   0x2588,   0x29c0,   0x3ef8,   0x471a,   0x471b};
+int header[15]     = {0x24e2, 0x24ee, 0x2588, 0x29c0, 0x2a46,  0x2f8e,  0x3ef8,  0x3ef9, 0x471a,  0x471b, 0x471b,  0x471e, 0x0f423d, 0x0f423e,0x0f423f};
 int FLAGS_WEAPON[7] =  {0x050328, 0x0503d8, 0x0503c0, 0x051270, 0x05d420, 0x05dd20, 0x05dd20};
 int FLAGSV_WEAPON[7] = {0x0a9ca8, 0x0a9d78, 0x0a9d58, 0x0ab8d0, 0x0c3bd8, 0x0c4c68, 0x0c4c68};
 int FLAGS_BOW[7]={0x0045f0, 0x0045f8, 0x0045f8, 0x0047e8, 0x004828, 0x004990, 0x004990};
@@ -14,7 +13,7 @@ int FLAGS_SHIELD[7]={0x0b5810, 0x0b58e8, 0x0b58c8, 0x0b7910, 0x0cfc70, 0x0d1038,
 void writeFile(){
 
     if(rupeeValue != rupees){
-            fseek(fp,rupID[version],SEEK_SET);
+            fseek(fp,rupID, SEEK_SET);
             fwrite(&rupeeValue, sizeof(long int), 1, fp);
     }
 
@@ -67,8 +66,8 @@ void getData(){
     int readHeader;
     
     fread(&readHeader, sizeof(int), 1, fp);
-    
-    for(version = 0; version<7; version++){
+
+    for(version = 0; version<15; version++){
         
         if(readHeader == header[version]){
             break;
@@ -76,7 +75,9 @@ void getData(){
         
     }
 
-    fseek(fp,rupID[version],SEEK_SET);
+    // The ID check logic in the next section is wrong for 1.6
+    
+    fseek(fp,rupID,SEEK_SET);
     fread(&rupees, sizeof(long int), 1, fp);
     rupeeValue = rupees;
     int endOfItems = 0;
@@ -96,7 +97,7 @@ void getData(){
             }
 
             sprintf(itemName[y] + strlen(itemName[y]),"%s", tmpString);
-            
+
             if(strcmp(itemName[y],"Armo") == 0)
                 endOfItems = 1;
 
@@ -135,7 +136,7 @@ void getData(){
         new_quantMod[x] = quantMod[x];
             
     }
-    
+
     
     for(x = 0; x<numberOfBows; x++){
         fseek(fp, FLAGS_BOW[version] + (8 * x),SEEK_SET);
@@ -170,7 +171,7 @@ int setFile(int intSlot){
 	numberOfItems = 0; 
 	rupeeValue = 0;
 	rupees = 0;
-    
+
     char file_name[] = "save:/0/game_data.sav";
     file_name[6] = (char)(intSlot + 48);
     fp = fopen(file_name,"r+b");
@@ -178,10 +179,7 @@ int setFile(int intSlot){
     if( fp == NULL )
     {
         return 0;
-    }
-
-
-    else{
+    } else {
         getData(); 
         return 1; 
     }

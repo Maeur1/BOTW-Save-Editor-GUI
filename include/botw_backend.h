@@ -15,10 +15,10 @@ int numberOfItems;
 long int rupeeValue;
 long int rupees;
 
-int rupID[7];
+int rupID;
 int itemsID[7];
 int itemsQuant[7];
-int header[7];
+int header[15];
 char versionArray[7][5];
 
 int FLAGS_WEAPON[7];
