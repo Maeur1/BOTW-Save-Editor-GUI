@@ -54,7 +54,7 @@ void SDL_DrawImage(SDL_Renderer* renderer, SDL_Texture *texture, int x, int y, i
 void showItemSDL(int currentItem, int arrow);
 void selectSlotMenu(int slotchar);
 void showKeyboard(int currentKey);
-void errorScreen();
+void errorScreen(char* errormsg);
 void showKeyboard();
 void showCurrentRup();
 void KeyboardScreen();

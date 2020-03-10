@@ -43,7 +43,8 @@ void KeyboardScreen(){
 	showKeyboard(0);
 }
 
-void errorScreen(){
+void errorScreen(char* errormsg){
+	printf("Error Screen: %s\n", errormsg);
 
 	SDL_ClearScreen(renderer, BACKGROUND_COLOR);
 	SDL_DrawRect(renderer,0,0,1280, 88, TOPBAR_COLOR);
@@ -363,7 +364,7 @@ void SDL_DrawText(TTF_Font *font, int x, int y, SDL_Color colour, const char *te
 	SDL_Surface *surface = TTF_RenderText_Blended_Wrapped(font, text, colour, 1280);
 	SDL_SetSurfaceAlphaMod(surface, 255);
 	SDL_Rect position = {x, y, surface->w, surface->h};
-	SDL_BlitSurface(surface, NULL, screenSurface, &position);
-	SDL_FreeSurface(surface);
+	SDL_Texture* t = SDL_CreateTextureFromSurface(renderer, surface);
+	SDL_DrawImage(renderer, t, position.x, position.y, position.w, position.h);
 }
 

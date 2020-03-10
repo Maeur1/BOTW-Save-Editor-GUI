@@ -34,7 +34,7 @@ void startSDLServices(){
 
     if(mountSaveData() == 0){
         currentState = -1;
-         errorScreen();
+        errorScreen("Failed to Mount Save Data");
     }
     else{
         if (file_exist("save:/6/caption.jpg"))
@@ -289,7 +289,7 @@ void ConfirmButton(){
             }
             else{
                 currentState = -1;
-                errorScreen();
+                errorScreen("Invalid Current State");
             }
             break;
         case 1:
