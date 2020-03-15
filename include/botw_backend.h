@@ -5,37 +5,37 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+typedef enum {
+    FLAGS_BOW = 0,
+    FLAGSV_BOW = 1,
+    RUPEES = 2,
+    FLAGS_WEAPON = 3,
+    ITEMS = 4,
+    FLAGSV_SHIELD = 5,
+    ITEMS_QUANTITY = 6,
+    FLAGSV_WEAPON = 7,
+    FLAGS_SHIELD = 8
+} Mapping;
 
+long locations[9];
+int maxSize;
 
 char itemName[60][40];
-long int quantItems[60];
-long int newQuantItems[60];
+int quantItems[60];
+int newQuantItems[60];
 int numberOfItems;
 
-long int rupeeValue;
-long int rupees;
-
-int rupID;
-int itemsID[7];
-int itemsQuant[7];
-int header[15];
-char versionArray[7][5];
-
-int FLAGS_WEAPON[7];
-int FLAGSV_WEAPON[7];
-int FLAGS_BOW[7];
-int FLAGSV_BOW[7];
-int FLAGS_SHIELD[7];
-int FLAGSV_SHIELD[7];
+int rupeeValue;
+int rupees;
 
 int numberOfWeapons;
 int numberOfBows;
 int numberOfShields;
 
-long int quantMod[60];
-long int new_quantMod[60];
-long int modNames[60];
-long int new_modNames[60];
+int quantMod[60];
+int new_quantMod[60];
+int modNames[60];
+int new_modNames[60];
 
 
 int maxArrows;

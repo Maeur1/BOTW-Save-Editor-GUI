@@ -1,48 +1,51 @@
 #include "botw_backend.h"
 
-int itemsID[7]    = {0x052828, 0x0528d8, 0x0528c0, 0x053890, 0x05fa48, 0x060408, 0x060408};
-int itemsQuant[7] = {0x063340, 0x0633f0, 0x0633d8, 0x064550, 0x070730, 0x0711c8, 0x0711c8};
 int header[15]     = {0x24e2, 0x24ee, 0x2588, 0x29c0, 0x2a46,  0x2f8e,  0x3ef8,  0x3ef9, 0x471a,  0x471b, 0x471b,  0x471e, 0x0f423d, 0x0f423e,0x0f423f};
-int FLAGS_WEAPON[7] =  {0x050328, 0x0503d8, 0x0503c0, 0x051270, 0x05d420, 0x05dd20, 0x05dd20};
-int FLAGSV_WEAPON[7] = {0x0a9ca8, 0x0a9d78, 0x0a9d58, 0x0ab8d0, 0x0c3bd8, 0x0c4c68, 0x0c4c68};
-int FLAGS_BOW[7]={0x0045f0, 0x0045f8, 0x0045f8, 0x0047e8, 0x004828, 0x004990, 0x004990};
-int FLAGSV_BOW[7]={0x00a8e0, 0x00a940, 0x00a940, 0x00ae08, 0x00ae90, 0x00b1e0, 0x00b1e0};
-int FLAGSV_SHIELD[7]={0x063218, 0x0632c8, 0x0632b0, 0x064420, 0x070600, 0x071098, 0x071098};
-int FLAGS_SHIELD[7]={0x0b5810, 0x0b58e8, 0x0b58c8, 0x0b7910, 0x0cfc70, 0x0d1038, 0x0d1038};
+long int hashes[] = {
+    0x0cbf052a,
+    0x1e3fd294,
+    0x23149bf8,
+    0x57ee221d,
+    0x5f283289,
+    0x69f17e8a,
+    0x6a09fc59,
+    0xa6d926bc,
+    0xc5238d2b
+};
 
 void writeFile(){
 
     if(rupeeValue != rupees){
-            fseek(fp,rupID, SEEK_SET);
+            fseek(fp,locations[RUPEES], SEEK_SET);
             fwrite(&rupeeValue, sizeof(long int), 1, fp);
     }
 
     for(int x = 0; x < numberOfItems; x++){
         if(newQuantItems[x] != quantItems[x]){
-            fseek(fp, itemsQuant[version] + (8 * x),SEEK_SET);
+            fseek(fp, locations[ITEMS_QUANTITY] + (8 * x),SEEK_SET);
             fwrite(&newQuantItems[x], sizeof(int), 1, fp);
         }
     }
 
     for(int x = 0; x<numberOfWeapons; x++){
         if(new_quantMod[x] != quantMod[x]){
-            fseek(fp, FLAGSV_WEAPON[version] + (8 * x),SEEK_SET);
+            fseek(fp, locations[FLAGSV_WEAPON] + (8 * x),SEEK_SET);
             fwrite(&new_quantMod[x], sizeof(int), 1, fp);
         }
 
         if(new_modNames[x] != modNames[x]){
-            fseek(fp, FLAGS_WEAPON[version] + (8 * x),SEEK_SET);
+            fseek(fp, locations[FLAGS_WEAPON] + (8 * x),SEEK_SET);
             fwrite(&new_modNames[x], sizeof(int), 1, fp);
         }    
     }
 
     for(int x = 0; x<numberOfBows; x++){
         if(new_quantMod[x + numberOfWeapons] != quantMod[x + numberOfWeapons]){
-            fseek(fp, FLAGSV_BOW[version] + (8 * x),SEEK_SET);
+            fseek(fp, locations[FLAGSV_BOW] + (8 * x),SEEK_SET);
             fwrite(&new_quantMod[x + numberOfWeapons], sizeof(int), 1, fp);
         }
         if(new_modNames[x + numberOfWeapons] != modNames[x + numberOfWeapons]){
-            fseek(fp, FLAGS_BOW[version] + (8 * x),SEEK_SET);
+            fseek(fp, locations[FLAGS_BOW] + (8 * x),SEEK_SET);
             fwrite(&new_modNames[x + numberOfWeapons], sizeof(int), 1, fp);
         }    
     }
@@ -50,34 +53,72 @@ void writeFile(){
     for(int x = 0; x<numberOfShields; x++){
 
         if(new_quantMod[x + numberOfWeapons + numberOfBows + 6] != quantMod[x + numberOfWeapons + numberOfBows + 6]){
-            fseek(fp, FLAGSV_SHIELD[version] + (8 * x),SEEK_SET);
+            fseek(fp, locations[FLAGSV_SHIELD] + (8 * x),SEEK_SET);
             fwrite(&new_quantMod[x + numberOfWeapons + numberOfBows + 6], sizeof(int), 1, fp);
         }
         if(new_modNames[x + numberOfWeapons + numberOfBows + 6] != modNames[x + numberOfWeapons + numberOfBows + 6]){
-            fseek(fp, FLAGS_SHIELD[version] + (8 * x),SEEK_SET);
+            fseek(fp, locations[FLAGS_SHIELD] + (8 * x),SEEK_SET);
             fwrite(&new_modNames[x + numberOfWeapons + numberOfBows + 6], sizeof(int), 1, fp);
         }
     }
 
 }
 
+unsigned int read32bit(){
+    unsigned int currentVal = 0, retVal = 0;
+    fread(&currentVal, sizeof currentVal, 1, fp);
+    retVal = (currentVal & 0xFF) << 24;
+    retVal |= (currentVal & (0xFF << 8)) << 8;
+    retVal |= (currentVal & (0xFF << 16)) >> 8;
+    retVal |= (currentVal & (0xFF << 24)) >> 24;
+    return currentVal;
+}
+
+void getOffsets(Mapping mapping){
+    unsigned int desiredHash = hashes[mapping];
+    long location = ftell(fp);
+    unsigned int currentHash = 0;
+    printf("Looking for Hash 0x%x\n", desiredHash);
+    while(location < maxSize){
+        currentHash = read32bit();
+        location = ftell(fp);
+        if(currentHash == desiredHash){
+            printf("Found Hash\n");
+            break;
+        }
+        fseek(fp, 4, SEEK_CUR);
+    }
+    fseek(fp, -4, SEEK_CUR);
+    locations[mapping] = location;
+}
+
 void getData(){
 
     int readHeader;
-    
+    fseek(fp,0,SEEK_END);
+    maxSize = ftell(fp);
+    fseek(fp,0,SEEK_SET);
     fread(&readHeader, sizeof(int), 1, fp);
-
     for(version = 0; version<15; version++){
-        
         if(readHeader == header[version]){
+            printf("Header found\n");
             break;
         }
-        
     }
+
+    getOffsets(FLAGS_BOW);
+    getOffsets(FLAGSV_BOW);
+    getOffsets(RUPEES);
+    getOffsets(ITEMS);
+    getOffsets(FLAGSV_SHIELD);
+    getOffsets(ITEMS_QUANTITY);
+    getOffsets(FLAGSV_WEAPON);
+    getOffsets(FLAGS_SHIELD);
+    
 
     // The ID check logic in the next section is wrong for 1.6
     
-    fseek(fp,rupID,SEEK_SET);
+    fseek(fp,locations[RUPEES],SEEK_SET);
     fread(&rupees, sizeof(long int), 1, fp);
     rupeeValue = rupees;
     int endOfItems = 0;
@@ -89,7 +130,7 @@ void getData(){
         for(int x = 0; x < 5; x++){
             char tmpString[5];
             
-            fseek(fp, itemsID[version] + (8 * x) + offset,SEEK_SET);
+            fseek(fp, locations[ITEMS] + (8 * x) + offset,SEEK_SET);
             fread(&tmpString, sizeof(int), 1, fp);
 
             if(tmpString[strlen(tmpString) - 1] == 2){
@@ -117,7 +158,7 @@ void getData(){
         if(endOfItems == 1)
             break;
 
-        fseek(fp, itemsQuant[version] + (8 * y),SEEK_SET);
+        fseek(fp, locations[ITEMS_QUANTITY] + (8 * y),SEEK_SET);
         fread(&quantItems[y], sizeof(int), 1, fp);
 
         newQuantItems[y] = quantItems[y];
@@ -128,9 +169,9 @@ void getData(){
 
     for(x = 0; x<numberOfWeapons; x++){
             
-        fseek(fp, FLAGS_WEAPON[version] + (8 * x),SEEK_SET);
+        fseek(fp, locations[FLAGS_WEAPON] + (8 * x),SEEK_SET);
         fread(&modNames[x], sizeof(int), 1, fp);
-        fseek(fp, FLAGSV_WEAPON[version] + (8 * x),SEEK_SET);
+        fseek(fp, locations[FLAGSV_WEAPON] + (8 * x),SEEK_SET);
         fread(&quantMod[x], sizeof(int), 1, fp);
         new_modNames[x] = modNames[x];
         new_quantMod[x] = quantMod[x];
@@ -139,18 +180,18 @@ void getData(){
 
     
     for(x = 0; x<numberOfBows; x++){
-        fseek(fp, FLAGS_BOW[version] + (8 * x),SEEK_SET);
+        fseek(fp, locations[FLAGS_BOW] + (8 * x),SEEK_SET);
         fread(&modNames[x + numberOfWeapons], sizeof(int), 1, fp);
-        fseek(fp, FLAGSV_BOW[version] + (8 * x),SEEK_SET);
+        fseek(fp, locations[FLAGSV_BOW] + (8 * x),SEEK_SET);
         fread(&quantMod[x + numberOfWeapons], sizeof(int), 1, fp);
         new_modNames[x + numberOfWeapons] = modNames[x + numberOfWeapons];
         new_quantMod[x + numberOfWeapons] = quantMod[x + numberOfWeapons];
     }
 
     for(x = 0; x<numberOfShields; x++){
-        fseek(fp, FLAGS_SHIELD[version] + (8 * x),SEEK_SET);
+        fseek(fp, locations[FLAGS_SHIELD] + (8 * x),SEEK_SET);
         fread(&modNames[x + numberOfWeapons + numberOfBows + 6], sizeof(int), 1, fp);
-        fseek(fp, FLAGSV_SHIELD[version] + (8 * x),SEEK_SET);
+        fseek(fp, locations[FLAGSV_SHIELD] + (8 * x),SEEK_SET);
         fread(&quantMod[x + numberOfWeapons + numberOfBows + 6], sizeof(int), 1, fp);
         new_modNames[x + numberOfWeapons + numberOfBows + 6] = modNames[x + numberOfWeapons + numberOfBows + 6];
         new_quantMod[x + numberOfWeapons + numberOfBows + 6] = quantMod[x + numberOfWeapons + numberOfBows + 6];
