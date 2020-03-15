@@ -64,23 +64,13 @@ void writeFile(){
 
 }
 
-unsigned int read32bit(){
-    unsigned int currentVal = 0, retVal = 0;
-    fread(&currentVal, sizeof currentVal, 1, fp);
-    retVal = (currentVal & 0xFF) << 24;
-    retVal |= (currentVal & (0xFF << 8)) << 8;
-    retVal |= (currentVal & (0xFF << 16)) >> 8;
-    retVal |= (currentVal & (0xFF << 24)) >> 24;
-    return currentVal;
-}
-
 void getOffsets(Mapping mapping){
     unsigned int desiredHash = hashes[mapping];
     long location = ftell(fp);
     unsigned int currentHash = 0;
     printf("Looking for Hash 0x%x\n", desiredHash);
     while(location < maxSize){
-        currentHash = read32bit();
+        fread(&currentHash, sizeof currentHash, 1, fp);
         location = ftell(fp);
         if(currentHash == desiredHash){
             printf("Found Hash\n");
