@@ -71,14 +71,13 @@ void getOffsets(Mapping mapping){
     printf("Looking for Hash 0x%x\n", desiredHash);
     while(location < maxSize){
         fread(&currentHash, sizeof currentHash, 1, fp);
+        fseek(fp, 4, SEEK_CUR);
         location = ftell(fp);
         if(currentHash == desiredHash){
             printf("Found Hash\n");
             break;
         }
-        fseek(fp, 4, SEEK_CUR);
     }
-    fseek(fp, -4, SEEK_CUR);
     locations[mapping] = location;
 }
 
