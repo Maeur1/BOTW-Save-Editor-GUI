@@ -68,13 +68,11 @@ void getOffsets(Mapping mapping){
     unsigned int desiredHash = hashes[mapping];
     long location = ftell(fp);
     unsigned int currentHash = 0;
-    printf("Looking for Hash 0x%x\n", desiredHash);
     while(location < maxSize){
         fread(&currentHash, sizeof currentHash, 1, fp);
         location = ftell(fp);
         fseek(fp, 4, SEEK_CUR);
         if(currentHash == desiredHash){
-            printf("Found Hash\n");
             break;
         }
     }
@@ -90,7 +88,6 @@ void getData(){
     fread(&readHeader, sizeof(int), 1, fp);
     for(version = 0; version<15; version++){
         if(readHeader == header[version]){
-            printf("Header found\n");
             break;
         }
     }

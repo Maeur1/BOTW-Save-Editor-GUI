@@ -124,10 +124,8 @@ int KeyboardScreen(int currentItem, int defaultValue){
 	swkbdConfigSetBlurBackground(&kbd, true);
 	swkbdShow(&kbd, value, sizeof(value));
 	if(!*value){
-		printf("Existing Value\n");
 		return existingValue;
 	}else {
-		printf("New value: %s\n", value);
 		return atoi(value);
 	}
 }
