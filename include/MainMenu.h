@@ -57,7 +57,7 @@ void showItemSDL(int currentItem, int arrow);
 void selectSlotMenu(int slotchar);
 void errorScreen(char* errormsg);
 void showCurrentRup();
-int KeyboardScreen(int currentItem, int defaultValue);
+void KeyboardScreen(int* currentValue, char* itemText);
 void showBoxSelect(int pos);
 void Show_DropDownMenu(int pos);
 void Show_DropDownMenuMod(int pos);

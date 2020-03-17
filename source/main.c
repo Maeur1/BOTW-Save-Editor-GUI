@@ -264,7 +264,8 @@ void ConfirmButton(){
             if(itemBox == 1){
                 keyboard = 0;
                 keyboardy = 0;
-                KeyboardScreen(currentItem, 0);
+                KeyboardScreen(&(newQuantItems[currentItem]), itemName[currentItem]);
+                mainUI(buttons, currentPage, maxPage,1,1);
             }
             if(itemBox == 2){
                 itemBox = 1;
@@ -282,7 +283,8 @@ void ConfirmButton(){
             else if(itemBox == 2){
                 keyboard = 0;
                 keyboardy = 0;
-                KeyboardScreen(currentItem, 0);
+                KeyboardScreen(&(newQuantItems[currentItem]), itemName[currentItem]);
+                mainUI(buttons, currentPage, maxPage,1,1);
             }
             break;
         case 4:
@@ -456,7 +458,8 @@ void RupeeKey(){
         isopen = 0;
     }
     else if(isopen == 0){
-        rupeeValue = KeyboardScreen(-1, rupeeValue);
+        KeyboardScreen(&rupeeValue, "Rupees");
+        mainUI(buttons, currentPage, maxPage,0,0);
     }
 }
 

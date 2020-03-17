@@ -112,21 +112,16 @@ void mainUI(int x, int currentPage, int maxPage, int showBox, int BoxPos){
 }
 
 
-int KeyboardScreen(int currentItem, int defaultValue){
-	char* headerText = (currentItem != -1) ? itemName[currentItem] : "";
+void KeyboardScreen(int* currentValue, char* itemText){
 	char value[25] = {0};
-	int existingValue = (currentItem != -1) ? (int)newQuantItems[currentItem] : (int)defaultValue;
 	
-	snprintf(value, sizeof value, "%d", existingValue);
-	SDL_RenderPresent(renderer);
-	swkbdConfigSetInitialText(&kbd, value);
-	swkbdConfigSetHeaderText(&kbd, headerText);
+	snprintf(value, sizeof value, "%d", *currentValue);
 	swkbdConfigSetBlurBackground(&kbd, true);
+	swkbdConfigSetInitialCursorPos(&kbd, 0);
+	swkbdConfigSetInitialText(&kbd, value);
 	swkbdShow(&kbd, value, sizeof(value));
-	if(!*value){
-		return existingValue;
-	}else {
-		return atoi(value);
+	if(*value){
+		*currentValue = atoi(value);
 	}
 }
 
