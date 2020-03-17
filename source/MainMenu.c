@@ -33,16 +33,6 @@ void exitMenu(int pos){
 
 }
 
-void KeyboardScreen(){
-	SDL_DrawImage(renderer, back, 0, 0, 1280, 720);
-	SDL_DrawRect(renderer, 120, 30, 1040, 210, WHITE_COLOR);
-	SDL_DrawRect(renderer, 122, 32, 1036, 206, BACKGROUND_COLOR);
-	SDL_DrawRect(renderer, 0,270,1280,450, LEFTBAR_COLOR);
-	SDL_DrawRect(renderer,30,648,1220,2, WHITE_COLOR);
-	SDL_RenderPresent(renderer);
-	showKeyboard(0);
-}
-
 void errorScreen(char* errormsg){
 	printf("Error Screen: %s\n", errormsg);
 
@@ -122,54 +112,24 @@ void mainUI(int x, int currentPage, int maxPage, int showBox, int BoxPos){
 }
 
 
-void showKeyboard(int currentKey){
-
-	char populateKeyboard[9][2] = {"1", "2", "3", "4", "5", "6", "7", "8", "9"};
-
-	for(int y = 0; y < 3; y++){
-		for(int x = 0; x < 3; x++){
-
-			if((x + (y * 3)) == currentKey){
-				SDL_DrawRect(renderer, 470 + (x * 110), 300 + (y * 80), 105, 75, TOPBAR_COLOR);
-				SDL_DrawText(Arial, 510 + (x * 110), 320 + (y * 80), BLUE_TEXT_COLOR, populateKeyboard[x + (y * 3)]);
-			} 	
-			else{
-				SDL_DrawRect(renderer, 470 + (x * 110), 300 + (y * 80), 105, 75, ITEM_COLOR);
-				SDL_DrawText(Arial, 510 + (x * 110), 320 + (y * 80), WHITE_TEXT_COLOR, populateKeyboard[x + (y * 3)]);
-			}
-				
-		}
-	}
-
-	if(currentKey == 9){
-		SDL_DrawImage(renderer, bbuttonp, 470, 540, 105, 75);
-	}
-	else{
-		SDL_DrawImage(renderer, bbutton, 470, 540, 105, 75);
-	}
+int KeyboardScreen(int currentItem, int defaultValue){
+	char* headerText = (currentItem != -1) ? itemName[currentItem] : "";
+	char value[25] = {0};
+	int existingValue = (currentItem != -1) ? (int)newQuantItems[currentItem] : (int)defaultValue;
 	
-	if(currentKey == 11){
-		SDL_DrawImage(renderer, okbuttonp, 690, 540, 105, 75);
-	}
-	else{
-		SDL_DrawImage(renderer, okbutton, 690, 540, 105, 75);
-	}
-
-	if(currentKey == 10){
-		SDL_DrawRect(renderer, 580, 540, 105, 75, TOPBAR_COLOR);
-		SDL_DrawText(Arial, 620, 560, BLUE_TEXT_COLOR, "0");
-	}
-	else{
-		SDL_DrawRect(renderer, 580, 540, 105, 75, ITEM_COLOR);
-		SDL_DrawText(Arial, 620, 560, WHITE_TEXT_COLOR, "0");
-	}
-	
-	
-
-
+	snprintf(value, sizeof value, "%d", existingValue);
 	SDL_RenderPresent(renderer);
-
-
+	swkbdConfigSetInitialText(&kbd, value);
+	swkbdConfigSetHeaderText(&kbd, headerText);
+	swkbdConfigSetBlurBackground(&kbd, true);
+	swkbdShow(&kbd, value, sizeof(value));
+	if(!*value){
+		printf("Existing Value\n");
+		return existingValue;
+	}else {
+		printf("New value: %s\n", value);
+		return atoi(value);
+	}
 }
 
 

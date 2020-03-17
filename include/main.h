@@ -25,6 +25,8 @@ int number;
 int currentItem;
 int maxSlot;
 
+extern SwkbdConfig kbd;
+
 int main(int argc, char **argv);
 void startSDLServices();
 void initServices();
@@ -34,7 +36,6 @@ void MenuButtons(int x);
 void MenuButtonsSlot(int x);
 void ConfirmButton();
 void setPages();
-void KeyboardButtons(int x);
 void BackButton();
 void ItemMenu(int x);
 void RupeeKey();

@@ -1,6 +1,7 @@
 #ifndef _MAINMENU_H_
 #define _MAINMENU_H_
 
+#include <switch.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL_image.h>
@@ -23,6 +24,7 @@ SDL_Texture *check;
 
 int isArrow;
 
+SwkbdConfig kbd;
 
 static inline SDL_Color SDL_MakeColor(Uint8 r, Uint8 g, Uint8 b)
 {
@@ -53,11 +55,9 @@ SDL_Surface *SDL_LoadImage(SDL_Renderer* renderer, SDL_Texture **texture, char *
 void SDL_DrawImage(SDL_Renderer* renderer, SDL_Texture *texture, int x, int y, int w, int h);
 void showItemSDL(int currentItem, int arrow);
 void selectSlotMenu(int slotchar);
-void showKeyboard(int currentKey);
 void errorScreen(char* errormsg);
-void showKeyboard();
 void showCurrentRup();
-void KeyboardScreen();
+int KeyboardScreen(int currentItem, int defaultValue);
 void showBoxSelect(int pos);
 void Show_DropDownMenu(int pos);
 void Show_DropDownMenuMod(int pos);

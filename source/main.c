@@ -74,6 +74,7 @@ int file_exist (char *filename)
 }
 
 void initServices(){
+    Result rc = 0;
     buttons = 0;
     slot = 0;
     currentPage = 1;
@@ -81,6 +82,10 @@ void initServices(){
     currentItem = 0;
     romfsInit();
     startSDLServices();
+    rc = swkbdCreate(&kbd, 0);
+    if(R_SUCCEEDED(rc)) {
+        swkbdConfigSetType(&kbd, SwkbdType_NumPad);
+    }
 }
 
 void setPages(){
@@ -109,15 +114,6 @@ void buttonLogic(int x){
             break;
         case 4:
             dropMenuButtons(x);
-            break;
-        case 7:
-            KeyboardButtons(x);
-            break;
-        case 8:
-            KeyboardButtons(x);
-            break;
-        case 9:
-            KeyboardButtons(x);
             break;
     }
 
@@ -206,40 +202,6 @@ void BackButton(){
     }
 }
 
-void KeyboardButtons(int x){
-
-    switch(x){
-        case 0:
-            keyboardy--;
-            if(keyboardy <= -1){
-                keyboardy = 3;
-            }
-            break;
-        case 1:
-            keyboardy++;
-            if(keyboardy >= 4){
-                keyboardy = 0;
-            }
-            break;
-        case 2:
-            keyboard++;
-            if(keyboard >= 3){
-                keyboard = 0;
-            }
-            break;
-        case 3:
-            keyboard--;
-            if(keyboard <= -1){
-                keyboard = 2;
-            }
-            break;
-    }
-
-    key = keyboard + (keyboardy * 3);
-    showKeyboard(key);
-
-}
-
 void MenuButtonsSlot(int x){
 
     switch(x){
@@ -300,11 +262,9 @@ void ConfirmButton(){
             break;
         case 2:
             if(itemBox == 1){
-                currentState = 8;
                 keyboard = 0;
                 keyboardy = 0;
-                KeyboardScreen();
-                isopen = 1;
+                KeyboardScreen(currentItem, 0);
             }
             if(itemBox == 2){
                 itemBox = 1;
@@ -320,11 +280,9 @@ void ConfirmButton(){
                 currentState++;
             }
             else if(itemBox == 2){
-                currentState = 9;
                 keyboard = 0;
                 keyboardy = 0;
-                KeyboardScreen();
-                isopen = 1;
+                KeyboardScreen(currentItem, 0);
             }
             break;
         case 4:
@@ -333,53 +291,7 @@ void ConfirmButton(){
             currentState = 2;
             mainUI(buttons, currentPage, maxPage,1,1);
             break;
-
-        case 7:  
-            KeyboardLogic();
-            if(key == 11){
-                rupeeValue = number;
-                currentState = 1;
-                mainUI(buttons, currentPage, maxPage,0,0);
-                isopen = 0;
-                positionKey = 0;
-                key = 0;
-                str[positionKey] = '\0';
-
-            }
-            
-            break;
-
-        case 8:
-            KeyboardLogic();
-            if(key == 11){
-                newQuantItems[currentItem] = number;
-                currentState = 2;
-                mainUI(buttons, currentPage, maxPage,1,1);
-                isopen = 0;
-                positionKey = 0;
-                key = 0;
-                str[positionKey] = '\0';
-
-            }
-            
-            break;
-
-        case 9:
-            KeyboardLogic();
-            if(key == 11){
-                new_quantMod[currentItem] = number;
-                currentState = 2;
-                mainUI(buttons, currentPage, maxPage,1,2);
-                isopen = 0;
-                positionKey = 0;
-                key = 0;
-                str[positionKey] = '\0';
-
-            }
-            break;
-
     }
-
 }
 
 void KeyboardLogic(){
@@ -544,15 +456,12 @@ void RupeeKey(){
         isopen = 0;
     }
     else if(isopen == 0){
-        currentState = 7;
-        keyboard = 0;
-        keyboardy = 0;
-        KeyboardScreen();
-        isopen = 1;
+        rupeeValue = KeyboardScreen(-1, rupeeValue);
     }
 }
 
 void closeServices(){
+    swkbdClose(&kbd);
     fclose(fp);
     unmountSaveData();
     fsdevUnmountDevice("save");
